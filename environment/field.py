@@ -45,11 +45,6 @@ class Field:
             result.append(self.height_for_column(i))
         return result
 
-
-    ################################################
-    #                   HEURISTICS                 #
-    ################################################
-
     def heuristics(self):
         heights = self.heights()
         return [self.aggregate_height(heights), self.complete_line() , self.number_of_holes(heights), self.bumpinesses(heights)]

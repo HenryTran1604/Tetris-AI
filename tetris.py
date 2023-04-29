@@ -1,11 +1,10 @@
 import random
-from ai import Ai
+import numpy as np
+from environment.ai import Ai
 import pygame, sys
-from utils import *
-
+from environment.utils import *
 
 import pygame.freetype as ft
-
 
 class Frame(object):
     def __init__(self):
@@ -20,8 +19,7 @@ class Frame(object):
     def draw_background(self):
         for x in range(FIELD_W):
             for y in range(FIELD_H):
-                pygame.draw.rect(self.screen, 'black',
-                        (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1)
+                pygame.draw.rect(self.screen, 'black', (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1)
 
     def disp_msg(self, msg, fcolor, topleft):
         x,y = topleft
@@ -75,15 +73,18 @@ class Frame(object):
 
 class Tetris(object):
     
-    def __init__(self, user, playWithUI, seed):
+    def __init__(self, user, display, seed):
         self.user = user
         self.nbPiece = 0
         random.seed(seed)
         self.next_stone = SHAPES[random.randint(0, len(SHAPES)-1)]
-        self.playWithUI = playWithUI
-        self.fast_mode = not user 
-        self.frame = Frame()
-        
+        self.display = display
+        self.fast_mode = not user
+        if display:
+            self.frame = Frame()
+        self.gameover = False
+        self.paused = False
+
         self.init_game()
 
     def new_stone(self):
@@ -103,7 +104,6 @@ class Tetris(object):
         self.level = 1
         self.score = 0
         self.lines = 0
-        self.gameover = self.paused = False
 
     def add_cl_lines(self, n):
         linescores = [0, 40, 100, 300, 1200]
@@ -119,9 +119,7 @@ class Tetris(object):
                 new_x = 0
             if new_x > FIELD_W - len(self.stone[0]):
                 new_x = FIELD_W - len(self.stone[0])
-            if not check_collision(self.board,
-                                   self.stone,
-                                   (new_x, self.stone_y)):
+            if not check_collision(self.board, self.stone, (new_x, self.stone_y)):
                 self.stone_x = new_x
 
     def drop(self, manual):
@@ -141,7 +139,7 @@ class Tetris(object):
                 return True
         return False
 
-    def insta_drop(self):
+    def instance_drop(self):
         if not self.gameover and not self.paused:
             while(not self.drop(True)):
                 pass
@@ -152,7 +150,7 @@ class Tetris(object):
             if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
                 self.stone = new_stone
 
-    def toggle_pause(self):
+    def pause(self):
         self.paused = not self.paused
 
     def start_game(self):
@@ -161,8 +159,7 @@ class Tetris(object):
             self.gameover = False
 
     def quit(self):
-        if self.playWithUI:
-            self.frame.center_msg("Exiting...")
+        if self.display:
             pygame.display.update()
         sys.exit()
 
@@ -170,7 +167,7 @@ class Tetris(object):
         self.fast_mode = not self.fast_mode
         if self.fast_mode:
             pygame.time.set_timer(pygame.USEREVENT+1, 2000)
-            self.insta_drop()
+            self.instance_drop()
         else:
             pygame.time.set_timer(pygame.USEREVENT+1, 25)
 
@@ -181,15 +178,15 @@ class Tetris(object):
             'RIGHT':    lambda:self.move(+1),
             'DOWN':        lambda:self.drop(True),
             'UP':        self.rotate_stone,
-            'p':        self.toggle_pause,
+            'p':        self.pause,
             'SPACE':    self.start_game,
-            'RETURN':    self.insta_drop
+            'RETURN':    self.instance_drop
         }
         for action in moves:
             key_actions[action]()
 
         if self.fast_mode:
-            self.insta_drop()
+            self.instance_drop()
 
 
     def run(self, weights, limitPiece):
@@ -202,14 +199,36 @@ class Tetris(object):
             if self.nbPiece >= limitPiece and limitPiece > 0:
                 self.gameover = True
 
-            if self.playWithUI:
+            if self.display:
                 self.frame.update(self)
 
             if self.gameover:
                 return self.lines*1000 + self.nbPiece
 
-            if self.playWithUI:
-                if self.user:
+            if self.user:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == pygame.USEREVENT+1:
+                        self.drop(False)
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_LEFT:
+                            self.move(-1)
+                        elif event.key == pygame.K_RIGHT:
+                            self.move(1)
+                        elif event.key == pygame.K_UP:
+                            self.rotate_stone()
+                        elif event.key == pygame.K_DOWN:
+                            self.instance_drop()
+                        elif event.key == pygame.K_p:
+                                self.pause()
+            else:
+                if not self.computed:
+                    self.computed = True
+                    Ai.choose(self.board, self.stone, self.next_stone, self.stone_x, weights, self)
+
+                if self.display:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             pygame.quit()
@@ -217,43 +236,19 @@ class Tetris(object):
                         elif event.type == pygame.USEREVENT+1:
                             self.drop(False)
                         elif event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_LEFT:
-                                self.move(-1)
-                            elif event.key == pygame.K_RIGHT:
-                                self.move(1)
-                            elif event.key == pygame.K_UP:
-                                self.rotate_stone()
-                            elif event.key == pygame.K_DOWN:
-                                self.insta_drop()
-                            elif event.key == pygame.K_p:
-                                    self.toggle_pause()
-                else:
-                    if not self.computed:
-                        self.computed = True
-                        Ai.choose(self.board, self.stone, self.next_stone, self.stone_x, weights, self)
-
-                    if self.playWithUI:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                                sys.exit()
-                            elif event.type == pygame.USEREVENT+1:
-                                self.drop(False)
-                            elif event.type == pygame.QUIT:
-                                    self.quit()
-                            elif event.type == pygame.KEYDOWN:
-                                if event.key == eval("pygame.K_s"):
-                                    self.speed_up()
-                                elif event.key == eval("pygame.K_p"):
-                                    self.toggle_pause()
+                            if event.key == eval("pygame.K_s"):
+                                self.speed_up()
+                            elif event.key == eval("pygame.K_p"):
+                                self.pause()
                                 
 
             #dont_burn_my_cpu.tick(maxfps)
 
 
 if __name__ == '__main__':
-    # weights = [-7.079322515535496, 0.4084491347254038, -7.402904430910445, -2.7844637476685787] #21755 lignes
-    weights = [-8.089717098754974, 4.901749501569805, -6.339604236296072, -3.51763821076156]
-    result = Tetris(user=False, playWithUI=True, seed=4).run(weights, -1)
+    # weights = [1, 1, 1, 1] #21755 lignes
+    # weights = [-7.729900101782016, 2.839002198171473, -8.114470728396613, -3.788259232308481]
+    weights = np.loadtxt('weights/optimal.txt')
+    result = Tetris(user=True, display=True, seed=4).run(weights, -1)
     # print(result)
     # app = Tetris(True, 5).run2()
