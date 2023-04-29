@@ -44,7 +44,7 @@ def select_best_individuals(scores, number): # chọn ra number cá thể tốt 
 def fitness(individual, seeds, pieceLimit): # hàm fitness bằng trung bình cộng các điểm qua các lần chơi của 1 cá thể
     results = []
     for seed in seeds:
-        results.append(Tetris(display= False, user=False, seed=seed).run(individual, pieceLimit))
+        results.append(Tetris(display=False, user=False, seed=seed).run(individual, pieceLimit))
     return int(sum(results)/len(results))
 
 

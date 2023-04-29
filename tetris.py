@@ -32,7 +32,7 @@ class Frame(object):
         self.screen.fill(color=FIELD_COLOR, rect=(0, 0, *WIN_RES))
         for i, line in enumerate(msg.splitlines()):
             text_surface, _ = self.default_font.render(line, (255, 0, 255), size=30)
-            text_rect = text_surface.get_rect(center=(WIN_W // 2, WIN_H // 2))
+            text_rect = text_surface.get_rect(center=(WIN_W // 2, WIN_H//3 + i * 45))
             self.screen.blit(text_surface, text_rect)
 
     def draw_matrix(self, matrix, offset):
@@ -48,14 +48,14 @@ class Frame(object):
         self.screen.fill(color=BG_COLOR) # set màu nền
         self.screen.fill(color=FIELD_COLOR, rect=(0, 0, *FIELD_RES))
         if tetris.gameover:# or self.nbPiece >= maxPiece:
-            self.center_msg("""Game Over!\nYour score: %dPress space to continue""" % tetris.score)
+            self.center_msg("""Game Over!\nYour score: %d\nPress space to continue""" % tetris.score)
         else:
             if tetris.paused:
                 self.center_msg("Paused")
             else:
                 pygame.draw.line(self.screen, (255,255,255), (FIELD_RES[0]+1, 0), (FIELD_RES[0]+1, WIN_H-1))
-                self.disp_msg("Next:", 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE))
-                self.disp_msg('Score:', 'white', (FIELD_RES[0]+TILE_SIZE, TILE_SIZE*7))
+                self.disp_msg("Next", 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE))
+                self.disp_msg('Score', 'white', (FIELD_RES[0]+TILE_SIZE, TILE_SIZE*7))
                 self.disp_msg(str(tetris.score), 'orange', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 9))
                 self.disp_msg('Level', 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 11))
                 self.disp_msg(str(tetris.level), 'orange',(FIELD_RES[0] + TILE_SIZE*2, TILE_SIZE * 13))
@@ -65,8 +65,8 @@ class Frame(object):
 
                 self.draw_background()
                 self.draw_matrix(tetris.board, (0,0))
-                self.draw_matrix(tetris.stone, (tetris.stone_x, tetris.stone_y))
-                self.draw_matrix(tetris.next_stone, (FIELD_W+2,3))
+                self.draw_matrix(tetris.tetromino, (tetris.tetromino_x, tetris.tetromino_y))
+                self.draw_matrix(tetris.next_tetromino, (FIELD_W+2,3))
         pygame.display.update()
 
 
@@ -77,7 +77,7 @@ class Tetris(object):
         self.user = user
         self.nbPiece = 0
         random.seed(seed)
-        self.next_stone = SHAPES[random.randint(0, len(SHAPES)-1)]
+        self.next_tetromino = TETROMINOES[random.randint(0, len(TETROMINOES)-1)]
         self.display = display
         self.fast_mode = not user
         if display:
@@ -87,20 +87,20 @@ class Tetris(object):
 
         self.init_game()
 
-    def new_stone(self):
-        self.stone = self.next_stone[:]
-        self.next_stone = SHAPES[random.randint(0, len(SHAPES)-1)]
-        self.stone_x = int(FIELD_W / 2 - len(self.stone[0])/2)
-        self.stone_y = 0
+    def new_tetromino(self):
+        self.tetromino = self.next_tetromino[:]
+        self.next_tetromino = TETROMINOES[random.randint(0, len(TETROMINOES)-1)]
+        self.tetromino_x = int(FIELD_W / 2 - len(self.tetromino[0])/2)
+        self.tetromino_y = 0
         self.nbPiece += 1
         self.computed = False
 
-        if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
+        if check_collision(self.board, self.tetromino, (self.tetromino_x, self.tetromino_y)):
             self.gameover = True
 
     def init_game(self):
         self.board = new_board()
-        self.new_stone()
+        self.new_tetromino()
         self.level = 1
         self.score = 0
         self.lines = 0
@@ -114,21 +114,21 @@ class Tetris(object):
 
     def move(self, delta_x):
         if not self.gameover and not self.paused:
-            new_x = self.stone_x + delta_x
+            new_x = self.tetromino_x + delta_x
             if new_x < 0:
                 new_x = 0
-            if new_x > FIELD_W - len(self.stone[0]):
-                new_x = FIELD_W - len(self.stone[0])
-            if not check_collision(self.board, self.stone, (new_x, self.stone_y)):
-                self.stone_x = new_x
+            if new_x > FIELD_W - len(self.tetromino[0]):
+                new_x = FIELD_W - len(self.tetromino[0])
+            if not check_collision(self.board, self.tetromino, (new_x, self.tetromino_y)):
+                self.tetromino_x = new_x
 
     def drop(self, manual):
         if not self.gameover and not self.paused:
             self.score += 1 if manual else 0
-            self.stone_y += 1
-            if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
-                self.board = join_matrixes(self.board, self.stone, (self.stone_x, self.stone_y))
-                self.new_stone()
+            self.tetromino_y += 1
+            if check_collision(self.board, self.tetromino, (self.tetromino_x, self.tetromino_y)):
+                self.board = join_matrixes(self.board, self.tetromino, (self.tetromino_x, self.tetromino_y))
+                self.new_tetromino()
                 cleared_rows = 0
 
                 for i, row in enumerate(self.board):
@@ -144,11 +144,11 @@ class Tetris(object):
             while(not self.drop(True)):
                 pass
 
-    def rotate_stone(self):
+    def rotate_tetromino(self):
         if not self.gameover and not self.paused:
-            new_stone = rotate_clockwise(self.stone)
-            if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
-                self.stone = new_stone
+            new_tetromino = rotate_clockwise(self.tetromino)
+            if not check_collision(self.board, new_tetromino, (self.tetromino_x, self.tetromino_y)):
+                self.tetromino = new_tetromino
 
     def pause(self):
         self.paused = not self.paused
@@ -177,7 +177,7 @@ class Tetris(object):
             'LEFT':        lambda:self.move(-1),
             'RIGHT':    lambda:self.move(+1),
             'DOWN':        lambda:self.drop(True),
-            'UP':        self.rotate_stone,
+            'UP':        self.rotate_tetromino,
             'p':        self.pause,
             'SPACE':    self.start_game,
             'RETURN':    self.instance_drop
@@ -192,17 +192,17 @@ class Tetris(object):
     def run(self, weights, limitPiece):
         self.gameover = False
         self.paused = False
-
         #dont_burn_my_cpu = pygame.time.Clock()
         while 1:
-
+            #for training
             if self.nbPiece >= limitPiece and limitPiece > 0:
                 self.gameover = True
 
             if self.display:
                 self.frame.update(self)
 
-            if self.gameover:
+            # for training
+            if not self.user and limitPiece > 0 and self.gameover:
                 return self.lines*1000 + self.nbPiece
 
             if self.user:
@@ -218,15 +218,17 @@ class Tetris(object):
                         elif event.key == pygame.K_RIGHT:
                             self.move(1)
                         elif event.key == pygame.K_UP:
-                            self.rotate_stone()
+                            self.rotate_tetromino()
                         elif event.key == pygame.K_DOWN:
                             self.instance_drop()
                         elif event.key == pygame.K_p:
-                                self.pause()
-            else:
+                            self.pause()
+                        elif event.key == pygame.K_SPACE and self.gameover:
+                            self.start_game()
+            else: # not display
                 if not self.computed:
                     self.computed = True
-                    Ai.choose(self.board, self.stone, self.next_stone, self.stone_x, weights, self)
+                    Ai.choose(self.board, self.tetromino, self.next_tetromino, self.tetromino_x, weights, self)
 
                 if self.display:
                     for event in pygame.event.get():
@@ -249,6 +251,4 @@ if __name__ == '__main__':
     # weights = [1, 1, 1, 1] #21755 lignes
     # weights = [-7.729900101782016, 2.839002198171473, -8.114470728396613, -3.788259232308481]
     weights = np.loadtxt('weights/optimal.txt')
-    result = Tetris(user=True, display=True, seed=4).run(weights, -1)
-    # print(result)
-    # app = Tetris(True, 5).run2()
+    tetris = Tetris(user=False, display=True, seed=4).run(weights, -1)

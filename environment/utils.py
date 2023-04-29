@@ -27,7 +27,7 @@ COLORS = [
 ]
 
 # Define the shapes of the single parts
-SHAPES = [
+TETROMINOES = [
     [[1, 1, 1],
      [0, 1, 0]],
 
