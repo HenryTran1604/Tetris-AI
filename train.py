@@ -6,16 +6,15 @@ survivors_rate = 0.7 # số lượng sống sót
 bests_rate = 0.1
 cross_over_rate = 0.1
 mutate_chance = 0.05
-pieceLimit = 500 # số lượng tetromino chơi tối đa
-number = 100 # số lượng cá thể trong 1 quần thể
-batch = 50 # số lần lặp
+pieceLimit = 100 # số lượng tetromino chơi tối đa
+number = 20 # số lượng cá thể trong 1 quần thể
+batch = 1 # số lần lặp
 size = 4 # số lượng thuộc tính trong hàm heuristic
 
 
 generation = create_generation(number, size)
 
 
-#generation = create_generation(number, size)
 optimal_weight = [0, [0]*4]
 with open('weights/v1.txt', 'w') as file:
     for iteration in range(0, batch):
@@ -28,7 +27,7 @@ with open('weights/v1.txt', 'w') as file:
         file.write("--- Batch " + str(iteration) + " ---\n")
         file.write("\n")
         scores = []
-        stdout.write('batch' + str(iteration))
+        print('Batch ' + str(iteration) + '/' + str(batch))
         
         for index, indiv in enumerate(generation):
             message = "\rindiv. " + str(index) + "/" + str(len(generation))
@@ -40,7 +39,7 @@ with open('weights/v1.txt', 'w') as file:
             file.write(str(value) + '\n')
     
         survivors_score, survivors = select_best_individuals(scores, int(len(scores)*survivors_rate))
-        if survivors_score[0] > optimal_weight[0]:
+        if survivors_score[0] >= optimal_weight[0]: # ưu tiên thế hệ sau
             optimal_weight = [survivors_score[0], survivors[0]]
         # file.write(len(bests))
         generation = survivors
@@ -51,7 +50,6 @@ with open('weights/v1.txt', 'w') as file:
             if random.uniform(0, 1) < 0.05:
                 individual = mutate(individual)
             generation.append(individual)
-        print(len(generation))
 
 with open('weights/optimal.txt', 'w') as file:
     for i in range(size):

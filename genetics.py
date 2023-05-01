@@ -3,7 +3,7 @@ import random
 from operator import itemgetter
 from tetris import Tetris
 
-def nomalize(indiv):
+def normalize(indiv):
     tmp = sum(x ** 2 for x in indiv)
     return [x/tmp for x in indiv]
 
@@ -11,7 +11,7 @@ def create_individual(size): # tạo ra cá thể ngẫu nhiên trọng số [ag
     result = []
     for i in range(0, size):
         result.append(random.uniform(-10, 10))
-    result = nomalize(result)
+    result = normalize(result)
     return result
 
 def create_generation(number, size): # tạo ra quần thể chưa number cá thể
@@ -24,7 +24,7 @@ def create_generation(number, size): # tạo ra quần thể chưa number cá th
 
 def mutate(x): # tạo đột biến, thay đổi 1 vị trí từ 0 đến 3 với xác suất 0.4
     x[random.randint(0, len(x) - 1)] += random.random() * 0.4 - 0.2
-    x = nomalize(x)
+    x = normalize(x)
     return x
 
 def cross_over(x, y): # lai chéo giữa các  cá thể bố mẹ.
@@ -34,6 +34,7 @@ def cross_over(x, y): # lai chéo giữa các  cá thể bố mẹ.
             result.append(y[i])
         else:
             result.append(x[i])
+    result = normalize(result)
     return result
 
 
