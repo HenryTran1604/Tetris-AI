@@ -14,7 +14,7 @@ class Frame(object):
 
         self.screen = pygame.display.set_mode(WIN_RES)
         pygame.event.set_blocked(pygame.MOUSEMOTION)
-        pygame.time.set_timer(pygame.USEREVENT+1, 150)
+        pygame.time.set_timer(pygame.USEREVENT+1, 300)
 
     def draw_background(self):
         for x in range(FIELD_W):
@@ -133,7 +133,7 @@ class Tetris(object):
 
                 for i, row in enumerate(self.board):
                     if 0 not in row:
-                        self.board = remove_row(self.board, i)
+                        # self.board = remove_row(self.board, i)
                         cleared_rows += 1
                 self.add_cl_lines(cleared_rows)
                 return True
@@ -251,4 +251,4 @@ if __name__ == '__main__':
     # weights = [1, 1, 1, 1] #21755 lignes
     # weights = [-7.729900101782016, 2.839002198171473, -8.114470728396613, -3.788259232308481]
     weights = np.loadtxt('weights/optimal.txt')
-    tetris = Tetris(user=False, display=True, seed=4).run(weights, -1)
+    tetris = Tetris(user=True, display=True, seed=random.randint(0, 100)).run(weights, -1)

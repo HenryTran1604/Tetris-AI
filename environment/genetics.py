@@ -37,7 +37,7 @@ def cross_over(x, y): # lai chéo giữa các  cá thể bố mẹ.
     return result
 
 
-def select_survivors(scores, number): # chọn ra number cá thể tốt nhất
+def select_best_individuals(scores, number): # chọn ra number cá thể tốt nhất
     bests = list(reversed(sorted(scores, key=itemgetter(0))))[0:number]
     return list(map(lambda x: x[0], bests)), list(map(lambda x: x[1], bests))
 

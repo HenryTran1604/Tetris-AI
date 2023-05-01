@@ -1,6 +1,6 @@
 from sys import stdout
 import time
-from genetics import *
+from environment.genetics import *
 import random
 survivors_rate = 0.7 # số lượng sống sót
 bests_rate = 0.1
@@ -28,6 +28,8 @@ with open('weights/v1.txt', 'w') as file:
         file.write("--- Batch " + str(iteration) + " ---\n")
         file.write("\n")
         scores = []
+        stdout.write('batch' + str(iteration))
+        
         for index, indiv in enumerate(generation):
             message = "\rindiv. " + str(index) + "/" + str(len(generation))
             stdout.write(message)
