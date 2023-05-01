@@ -3,7 +3,7 @@ import random
 from operator import itemgetter
 from tetris import Tetris
 
-def nomalize(indiv):
+def normalize(indiv):
     tmp = sum(x ** 2 for x in indiv)
     return [x/tmp for x in indiv]
 
@@ -11,8 +11,7 @@ def create_individual(size): # tạo ra cá thể ngẫu nhiên trọng số [ag
     result = []
     for i in range(0, size):
         result.append(random.uniform(-10, 10))
-    result = nomalize(result)
-    return result
+    return normalize(result)
 
 def create_generation(number, size): # tạo ra quần thể chưa number cá thể
     results = []
@@ -24,8 +23,7 @@ def create_generation(number, size): # tạo ra quần thể chưa number cá th
 
 def mutate(x): # tạo đột biến, thay đổi 1 vị trí từ 0 đến 3 với xác suất 0.4
     x[random.randint(0, len(x) - 1)] += random.random() * 0.4 - 0.2
-    x = nomalize(x)
-    return x
+    return normalize(x)
 
 def cross_over(x, y): # lai chéo giữa các  cá thể bố mẹ.
     result = []
@@ -34,10 +32,10 @@ def cross_over(x, y): # lai chéo giữa các  cá thể bố mẹ.
             result.append(y[i])
         else:
             result.append(x[i])
-    return result
+    return normalize(result)
 
 
-def select_best_individuals(scores, number): # chọn ra number cá thể tốt nhất
+def select_survivors(scores, number): # chọn ra number cá thể tốt nhất
     bests = list(reversed(sorted(scores, key=itemgetter(0))))[0:number]
     return list(map(lambda x: x[0], bests)), list(map(lambda x: x[1], bests))
 
