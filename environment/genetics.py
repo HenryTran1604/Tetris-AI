@@ -14,11 +14,11 @@ def create_individual(size): # tạo ra cá thể ngẫu nhiên trọng số [ag
     return normalize(result)
 
 def create_generation(number, size): # tạo ra quần thể chưa number cá thể
-    results = []
+    population = []
     for _ in range(0, number):
         tmp = create_individual(size)
-        results.append(tmp)
-    return results
+        population.append(tmp)
+    return population
 
 
 def mutate(x): # tạo đột biến, thay đổi 1 vị trí từ 0 đến 3 với xác suất 0.4

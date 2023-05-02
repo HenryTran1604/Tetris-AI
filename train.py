@@ -8,12 +8,11 @@ cross_over_rate = 0.1
 mutate_chance = 0.05
 pieceLimit = 500 # số lượng tetromino chơi tối đa
 number = 100 # số lượng cá thể trong 1 quần thể
-batch = 10 # số lần lặp
+batch = 2 # số lần lặp
 size = 4 # số lượng thuộc tính trong hàm heuristic
 
 
 generation = create_generation(number, size)
-
 
 optimal_weight = [0, [0]*4]
 with open('weights/v1.txt', 'w') as file:
@@ -39,7 +38,7 @@ with open('weights/v1.txt', 'w') as file:
             file.write(str(value) + '\n')
     
         survivors_score, survivors = select_survivors(scores, int(len(scores)*survivors_rate))
-        if survivors_score[0] >= optimal_weight[0]: # ưu tiên thế hệ sau
+        if survivors_score[0] > optimal_weight[0]:
             optimal_weight = [survivors_score[0], survivors[0]]
         # file.write(len(bests))
         generation = survivors
@@ -47,7 +46,7 @@ with open('weights/v1.txt', 'w') as file:
 
         while len(generation) < number:
             individual = cross_over(*random.sample(survivors[:int(bests_rate * number)], k=2))
-            if random.uniform(0, 1) < mutate_chance:
+            if random.uniform(0, 1) < 0.05:
                 individual = mutate(individual)
             generation.append(individual)
 

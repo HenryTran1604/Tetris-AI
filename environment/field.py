@@ -31,7 +31,7 @@ class Field:
     def undo(self, workingPieceIndex):
         self.field = [[0 if el == -workingPieceIndex else el for el in row] for row in self.field]
 
-    def height_for_column(self, column):
+    def height_of_column(self, column):
         _, height = self.size()
         for i in range(0, height):
             if self.field[i][column] != 0:
@@ -42,7 +42,7 @@ class Field:
         result = []
         width, _ = self.size()
         for i in range(0, width):
-            result.append(self.height_for_column(i))
+            result.append(self.height_of_column(i))
         return result
 
     def heuristics(self):

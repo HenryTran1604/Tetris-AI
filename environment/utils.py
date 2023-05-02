@@ -2,7 +2,6 @@ FPS = 60
 FIELD_COLOR = ( 48, 39, 32) # Màu nền 
 BG_COLOR = (24, 89, 117)
 
-SPRITE_DIR_PATH = 'assets/sprites'
 FONT_PATH = 'assets/font/FREAKSOFNATUREMASSIVE.ttf'
 
 TILE_SIZE = 30 # kích thước 1 khối
@@ -71,7 +70,7 @@ def join_matrixes(mat1, mat2, mat2_off):
     off_x, off_y = mat2_off
     for cy, row in enumerate(mat2):
         for cx, val in enumerate(row):
-            mat1[cy+off_y-1][cx+off_x] += val
+            mat1[cy+off_y-1    ][cx+off_x] += val
     return mat1
 
 def new_board():
