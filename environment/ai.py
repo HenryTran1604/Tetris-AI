@@ -38,10 +38,8 @@ class Ai:
     def choose(initialField, piece, next_piece, offsetX, weights, parent):
         field = Field()
         field.update_field(copy.deepcopy(initialField))
-
         offset, rotation, _ = Ai.best(field, [piece, next_piece], 0, weights, 1)
         moves = []
-
         offset = offset - offsetX
         for _ in range(0, rotation):
             moves.append("UP")
@@ -50,6 +48,4 @@ class Ai:
                 moves.append("RIGHT")
             else:
                 moves.append("LEFT")
-        #moves.append('RETURN')
         parent.executes_moves(moves)
-        #return moves

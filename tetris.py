@@ -169,7 +169,11 @@ class Tetris(object):
 
     def speed_up(self):
         self.fast_mode = not self.fast_mode
-        pygame.time.set_timer(pygame.USEREVENT+1, 25)
+        if self.fast_mode:
+            pygame.time.set_timer(pygame.USEREVENT+1, 25)
+        else:
+            pygame.time.set_timer(pygame.USEREVENT+1, 100)
+
 
     def executes_moves(self, moves):
         key_actions = {
@@ -205,6 +209,7 @@ class Tetris(object):
             if not self.user and limitPiece > 0 and self.gameover:
                 return self.lines*1000 + self.nbPiece
             if not self.user and not self.computed:
+                # print(self.computed)
                 self.computed = True
                 Ai.choose(self.board, self.tetromino, self.next_tetromino, self.tetromino_x, weights, self)
             if self.display:
@@ -234,6 +239,6 @@ class Tetris(object):
             
 if __name__ == '__main__':
     # weights = [1, 1, 1, 1] #21755 lignes
-    weights = [-7.729900101782016, 2.839002198171473, -8.114470728396613, -3.788259232308481]
-    # weights = np.loadtxt('weights/optimal.txt')
-    tetris = Tetris(user=False, display=True, seed=random.randint(0, 100)).run(weights, -1)
+    # weights = [-7.729900101782016, 2.839002198171473, -8.114470728396613, -3.788259232308481]
+    weights = np.loadtxt('weights/optimal.txt')
+    tetris = Tetris(user=False, display=True, seed=4).run(weights, -1)
