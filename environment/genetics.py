@@ -3,13 +3,13 @@ import random
 from operator import itemgetter
 from tetris import Tetris
 
-def create_individual(size): # tạo ra cá thể ngẫu nhiên trọng số [aggregate_height, complete_line, number_of_hole, bumpiness]
+def create_individual(size):
     result = []
     for i in range(0, size):
         result.append(random.uniform(-10, 10))
     return result
 
-def create_generation(number, size): # tạo ra quần thể chưa number cá thể
+def create_generation(number, size):
     population = []
     for _ in range(0, number):
         tmp = create_individual(size)
@@ -37,7 +37,7 @@ def select_survivors(scores, number): # chọn ra number cá thể tốt nhất
 def fitness(individual, seeds, pieceLimit): # hàm fitness bằng trung bình cộng các điểm qua các lần chơi của 1 cá thể
     results = []
     for seed in seeds:
-        results.append(Tetris(display=True, user=False, seed=seed).run(individual, pieceLimit))
+        results.append(Tetris(display=False, user=False, seed=seed).run(individual, pieceLimit))
     return int(sum(results)/len(results))
 
 

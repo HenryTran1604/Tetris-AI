@@ -21,11 +21,11 @@ class Frame(object):
             for y in range(FIELD_H):
                 pygame.draw.rect(self.screen, 'black', (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1)
 
-    def disp_msg(self, msg, fcolor, topleft):
+    def disp_msg(self, msg, fcolor, topleft, size):
         x,y = topleft
         for line in msg.splitlines():
             self.default_font.render_to(self.screen, (x, y),
-                text=line, fgcolor=fcolor, size=30 * 1.4, bgcolor=(0, 0, 0))
+                text=line, fgcolor=fcolor, size=size, bgcolor=None)
             y+=14
 
     def center_msg(self, msg):
@@ -54,15 +54,16 @@ class Frame(object):
                 self.center_msg("Paused")
             else:
                 pygame.draw.line(self.screen, (255,255,255), (FIELD_RES[0]+1, 0), (FIELD_RES[0]+1, WIN_H-1))
-                self.disp_msg("Next", 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE))
-                self.disp_msg('Score', 'white', (FIELD_RES[0]+TILE_SIZE, TILE_SIZE*7))
-                self.disp_msg(str(tetris.score), 'orange', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 9))
-                self.disp_msg('Level', 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 11))
-                self.disp_msg(str(tetris.level), 'orange',(FIELD_RES[0] + TILE_SIZE*2, TILE_SIZE * 13))
+                self.disp_msg("Next", 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE), 30*1.1)
+                self.disp_msg('Score', 'white', (FIELD_RES[0]+TILE_SIZE, TILE_SIZE*7), 30*1.1)
+                self.disp_msg(str(tetris.score), 'orange', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 9), 30)
+                self.disp_msg('Level', 'white', (FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 11), 30*1.1)
+                self.disp_msg(str(tetris.level), 'orange',(FIELD_RES[0] + TILE_SIZE*2, TILE_SIZE * 13), 30*1.1)
 
-                self.disp_msg('Lines', 'white',(FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 15))
-                self.disp_msg(str(tetris.lines), 'orange',(FIELD_RES[0] + TILE_SIZE*2, TILE_SIZE * 17))
+                self.disp_msg('Lines', 'white',(FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 15), 30*1.1)
+                self.disp_msg(str(tetris.lines), 'orange',(FIELD_RES[0] + TILE_SIZE*2, TILE_SIZE * 17), 30*1.1)
 
+                self.disp_msg('Mode: User' if tetris.user else 'Mode: AI', 'white',(FIELD_RES[0] + TILE_SIZE, TILE_SIZE * 19), 25)
                 self.draw_background()
                 self.draw_matrix(tetris.board, (0,0))
                 self.draw_matrix(tetris.tetromino, (tetris.tetromino_x, tetris.tetromino_y))
