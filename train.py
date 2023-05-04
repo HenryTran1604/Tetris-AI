@@ -6,8 +6,8 @@ survivors_rate = 0.7 # số lượng sống sót
 bests_rate = 0.1
 mutate_chance = 0.05
 pieceLimit = 500 # số lượng tetromino chơi tối đa
-number = 100 # số lượng cá thể trong 1 quần thể
-batch = 10 # số lần lặp
+number = 50 # số lượng cá thể trong 1 quần thể
+batch = 2 # số lần lặp
 size = 4 # số lượng thuộc tính trong hàm heuristic
 
 
@@ -23,13 +23,13 @@ with open('weights/v1.txt', 'w') as file:
             seeds.append(random.randint(0, 100000000))
 
         file.write("\n")
-        file.write("--- Batch " + str(iteration) + " ---")
+        file.write("--- Batch " + str(iteration+1) + " ---")
         file.write("\n")
         scores = []
-        print(f'\nBatch {iteration}/{batch}')
+        print(f'\nBatch {iteration+1}/{batch}')
         
         for index, indiv in enumerate(generation):
-            message = "\rindiv. " + str(index) + "/" + str(len(generation))
+            message = "\rindiv. " + str(index+1) + "/" + str(len(generation))
             stdout.write(message)
             stdout.flush()
             scores.append([fitness(indiv, seeds, pieceLimit), indiv])
@@ -44,7 +44,7 @@ with open('weights/v1.txt', 'w') as file:
         generation = survivors
         file.write("average: " + str(compute_average(generation)))
         duration = time.time() - start_time
-        file.write(f'\ntrain for generation {iteration} take {duration} seconds')
+        file.write(f'\ntrain for generation {iteration+1} take {duration} seconds')
         total_duration += duration
         while len(generation) < number:
             individual = cross_over(*random.sample(survivors[:int(bests_rate * number)], k=2))

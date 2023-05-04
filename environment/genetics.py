@@ -18,7 +18,9 @@ def create_generation(number, size):
 
 
 def mutate(x): # tạo đột biến, thay đổi 1 vị trí từ 0 đến 3
-    x[random.randint(0, len(x) - 1)] = random.uniform(-5, 5)
+    for i in range(len(x)):
+        if random.uniform(0, 1) > 0.6:
+            x[i] = random.uniform(-10, 10)
     return x
 
 def cross_over(x, y): # lai chéo giữa các  cá thể bố mẹ.
