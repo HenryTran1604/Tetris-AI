@@ -197,7 +197,6 @@ class Tetris(object):
     def run(self, weights, limitPiece):
         self.gameover = False
         self.paused = False
-        #dont_burn_my_cpu = pygame.time.Clock()
         while 1:
             #for training
             if self.nbPiece >= limitPiece and limitPiece > 0:
@@ -239,7 +238,6 @@ class Tetris(object):
                             self.speed_up()
             
 if __name__ == '__main__':
-    # weights = [1, 1, 1, 1] #21755 lignes
     # weights = [-7.729900101782016, 2.839002198171473, -8.114470728396613, -3.788259232308481]
     weights = np.loadtxt('weights/optimal.txt')
-    tetris = Tetris(user=False, display=True, seed=random.randint(0, 100)).run(weights, -1)
+    tetris = Tetris(user=False, display=True, seed=4).run(weights, -1)
