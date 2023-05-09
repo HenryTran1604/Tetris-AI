@@ -48,7 +48,7 @@ class Frame(object):
         self.screen.fill(color=BG_COLOR) # set màu nền
         self.screen.fill(color=FIELD_COLOR, rect=(0, 0, *FIELD_RES))
         if tetris.gameover:# or self.nbPiece >= maxPiece:
-            self.center_msg("""Game Over!\nYour score: %d\nPress space to continue""" % tetris.score)
+            self.center_msg("""Game Over!\nYour score: %d\nCompleted lines: %d\nPress space to continue""" % (tetris.score, tetris.lines))
         else:
             if tetris.paused:
                 self.center_msg("Paused")
