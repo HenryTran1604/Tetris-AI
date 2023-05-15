@@ -17,7 +17,7 @@ def create_generation(number, size):
     return population
 
 
-def mutate(x): # tạo đột biến, thay đổi 1 vị trí từ 0 đến 3
+def mutate(x):
     for i in range(len(x)):
         if random.uniform(0, 1) > 0.6:
             x[i] = random.uniform(-10, 10)
